@@ -29,5 +29,11 @@ def add_user(user:UserRegis,db:Session):
         raise HTTPException(status_code=400)
 
 def get_card(id:int,db:Session):
-    cards=db.query(Commision).filter_by(client_id=id).join(Malfunction).join(Priority).join(Status).all()
-    return cards
+    cards:list[Commision]=db.query(Commision).filter_by(client_id=id).join(Malfunction).join(Priority).join(Status).all()
+    array=list()
+    for card in cards:
+        tmp=Card(unique_id=card.unique_id,priority=card.prioriry.name,gadget_name=card.gadget_name,gadget_info=card.gadget_info,malfunction=card.malfunction_type.name,status=card.status.name,date=str(card.date))
+        array.append(tmp)
+        
+    return tmp
+

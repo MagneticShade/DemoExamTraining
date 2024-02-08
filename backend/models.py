@@ -50,6 +50,7 @@ class Status(Base):
 class Commision(Base):
     __tablename__="commision"
     id=Column(Integer,primary_key=True)
+    unique_id=Column(String(25))
     prioriry=Column(Integer,ForeignKey("priority.id"))
     date=Column(TIMESTAMP,default=now)
     gadget_name=Column(String(255))

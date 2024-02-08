@@ -53,4 +53,4 @@ def user_create(user:UserRegis,db:Session=Depends(get_db)):
 def get_commisions(id:int,db:Session=Depends(get_db)):
 
     commision=get_card(id,db)
-    for com in commision:
+    return
