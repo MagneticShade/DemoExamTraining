@@ -19,3 +19,7 @@ class Card(BaseModel):
     status:str
     date_of_completion:str|None
     time_added:str|None
+
+class Redirect(BaseModel):
+    id:int
+    path:str
