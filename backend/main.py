@@ -45,12 +45,13 @@ def user_check(user:UserLogin,db:Session=Depends(get_db)):
             
     raise HTTPException(status_code=404)
 
-@app.post("/user/create/")
+@app.post("/user/create/",response_model=Redirect)
 def user_create(user:UserRegis,db:Session=Depends(get_db)):
-    add_user(user,db)
+    id=add_user(user,db)
+    return Redirect(id=id,path="user.html")
 
 @app.get("/commisions/{id}")
 def get_commisions(id:int,db:Session=Depends(get_db)):
 
     commision=get_card(id,db)
-    return
+    return commision

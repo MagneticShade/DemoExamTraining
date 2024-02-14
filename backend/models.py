@@ -1,6 +1,6 @@
 from sqlalchemy import Column,Integer,String,ForeignKey,TIMESTAMP
 from sqlalchemy.sql.functions import now
-
+from sqlalchemy.orm import relationship
 from database import Base
 
 class Role(Base):
@@ -62,9 +62,19 @@ class Commision(Base):
     time_added=Column(TIMESTAMP)
     comments=Column(String(255))
     addendum=Column(String(255))
+    priorities=relationship("Priority",back_populates="commisions")
+    malfunctions=relationship("Malfunction",back_populates="commisions")
+    statuses=relationship("Status",back_populates="commisions")
+
+Priority.commisions=relationship("Commision",back_populates="priorities")
+Malfunction.commisions=relationship("Commision",back_populates="malfunctions")
+Status.commisions=relationship("Commision",back_populates="statuses")
+
 
 class Task(Base):
     __tablename__="task"
     id=Column(Integer,primary_key=True)
     assignee_id=Column(Integer,ForeignKey("user.id"))
     commision_id=Column(Integer,ForeignKey("commision.id"))
+
+    

@@ -15,10 +15,14 @@ def get_user(user:UserLogin,db:Session):
     return res
 
 def add_user(user:UserRegis,db:Session):
+    if(user.login=="" or user.password=="" or user.name=="" ):
+        raise HTTPException(400,detail="empty fields")
     us_log=UserLogin(login=user.login,password=user.password)
     if get_user(us_log,db):
         raise HTTPException(400,detail="User already exists")
     
+    
+
     user.password=hash(user.password)
     try:
         user_db=User(**user.model_dump(),role_id=3)
@@ -27,13 +31,23 @@ def add_user(user:UserRegis,db:Session):
         db.refresh(user_db)
     except:
         raise HTTPException(status_code=400)
+    return user_db.id
 
 def get_card(id:int,db:Session):
-    cards:list[Commision]=db.query(Commision).filter_by(client_id=id).join(Malfunction).join(Priority).join(Status).all()
-    array=list()
-    for card in cards:
-        tmp=Card(unique_id=card.unique_id,priority=card.prioriry.name,gadget_name=card.gadget_name,gadget_info=card.gadget_info,malfunction=card.malfunction_type.name,status=card.status.name,date=str(card.date))
-        array.append(tmp)
+    cards=db.query(Commision,Priority,Malfunction,Status).filter_by(client_id=id).join(Priority).join(Malfunction).join(Status)
+    print(cards)
+    array=list[Card]()
+    for commision,priority,malfunction,status in cards:
         
-    return tmp
+        array.append(Card(unique_id=commision.unique_id,
+                          priority=priority.prioriry_name,
+                          date=str(commision.date),
+                          gadget_name=commision.gadget_name,
+                          gadget_info=commision.gadget_info,
+                          malfunction=malfunction.malfunction_name,
+                          status=status.status_name,
+                          date_of_completion=str(commision.date_of_completion),
+                          time_added=str(commision.time_added)))
+
+    return array
 
