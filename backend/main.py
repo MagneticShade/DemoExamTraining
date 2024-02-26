@@ -1,10 +1,11 @@
-from fastapi import FastAPI,Depends,HTTPException
+from fastapi import FastAPI,Depends,HTTPException,Header
+from typing import Annotated
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from database import engine,LocalSession
 from models import Base
-from schemas import UserLog,UserRegis,UserCard,Redirect
-from crud import get_user,add_user,get_card
+from schemas import UserLog,UserRegis,UserCard,Redirect,RoleEdit
+from crud import get_user,add_user,get_card,get_roles,get_admin_card,edit_user_role
 
 Base.metadata.create_all(bind=engine)
 
@@ -55,3 +56,22 @@ def get_commisions(id:int,db:Session=Depends(get_db)):
 
     commision=get_card(id,db)
     return commision
+
+@app.get("/roles/")
+def get_roles_names(db:Session=Depends(get_db)):
+    roles=get_roles(db)
+    return roles
+
+@app.get("/admin/users/")
+def get_users_admin(db:Session=Depends(get_db),admin_id: Annotated[str | None, Header()] = None):
+    if admin_id is not None:
+        cards=get_admin_card(db,admin_id)
+        return cards
+    raise HTTPException(status_code=403,detail="forbidden")
+
+@app.patch("/admin/role/")
+def change_role(role_edit:RoleEdit,db:Session=Depends(get_db),admin_id: Annotated[str | None, Header()] = None):
+    if admin_id is not None:
+        edit_user_role(db,role_edit.id,role_edit.role_id,admin_id)
+    else:
+        raise HTTPException(status_code=403,detail="forbidden")

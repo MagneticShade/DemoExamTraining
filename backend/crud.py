@@ -47,9 +47,23 @@ def get_card(id:int,db:Session):
 def get_roles(db:Session):
     return db.query(Role).all()
 
-def get_admin_card(db:Session):
-    users=db.query(User).all()
-    array=list()
-    for user in users:
-        array.append(AdminCard(login=user.login,role_id=user.role_id))
-    return array
+def get_admin_card(db:Session,admin_id:int):
+    admin=db.query(User).filter_by(id=admin_id).first()
+    if admin.role_id==4:
+        users=db.query(User).all()
+        array=list()
+        for user in users:
+            array.append(AdminCard(login=user.login,role_id=user.role_id,id=user.id))
+        return array
+    raise HTTPException(status_code=403,detail="forbiden")
+
+def edit_user_role(db:Session,user_id:int,new_role_id:int,admin_id:int):
+    admin=db.query(User).filter_by(id=admin_id).first()
+    if admin.role_id==4:
+        try:
+            db.query(User).filter_by(id=user_id).update({"role_id":new_role_id})
+            db.commit()
+        except Exception:
+            raise HTTPException(status_code=400,detail="bad_request")
+    else:
+        raise HTTPException(status_code=403,detail="forbidden")

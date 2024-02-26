@@ -29,5 +29,10 @@ class UserCard(BaseModel):
     time_added:str|None
 
 class AdminCard(BaseModel):
+    id:int
     login:str
+    role_id:int
+
+class RoleEdit(BaseModel):
+    id:int
     role_id:int
